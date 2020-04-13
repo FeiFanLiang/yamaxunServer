@@ -104,7 +104,7 @@ class User extends Controller {
         
     }
     async login(){
-        const {ctx,service} = this;
+        const {ctx,service,app} = this;
         ctx.validate({  
             username:{
                 type:'string',
@@ -126,12 +126,18 @@ class User extends Controller {
             }
             const data = await service.user.initializeUserInfo(username)
             const userInfo = await service.user.getUserInfo(username)
-            ctx.session.userInfo = data
+            ctx.session.userInfo = data;
+            let time = +new Date(),maxAge = 3 * 24 * 60* 60 * 1000
+            ctx.cookies.set('access_token',time,{
+                maxAge
+            })
+            await app.redis.set(username,time,'PX',maxAge)
             this.success(userInfo)
         }
     }
     async logout(){
-        const {ctx} = this;
+        const {app,ctx} = this;
+        await app.redis.del(ctx.session.userInfo.username)
         ctx.session = null;
         this.success('注销成功')
     }

@@ -27,6 +27,9 @@ module.exports = appInfo => {
     const userConfig = {
         // myAppName: 'egg',
     };
+    config.compress = {
+        threshold: 1024
+    }
     config.security = {
         enable:false,
         domainWhiteList: ['http://127.0.0.1:8080','*'],
@@ -74,7 +77,7 @@ module.exports = appInfo => {
         jsonLimit: '5mb',
         formLimit: '10mb',
     };
-    config.middleware = ['auth']
+    config.middleware = ['auth','compress']
     config.auth = {
         enable:true,
         ignore(ctx){
